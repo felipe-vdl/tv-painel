@@ -23,7 +23,7 @@ const UserCreate = () => {
         setIsLoading(true);
         const formData = new FormData();
         formData.append("video", file, file.name);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/video/atualiza_video.php`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/atualiza_video.php`, {
           method: "POST",
           body: formData,
         });

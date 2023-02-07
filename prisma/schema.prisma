@@ -27,3 +27,9 @@ enum Role {
   ADMIN
   SUPERADMIN
 }
+
+model Dado {
+  id        Int @id @default(autoincrement())
+  nome      String @db.VarChar(50)
+  @@map("dados")
+}
