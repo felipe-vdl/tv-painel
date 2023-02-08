@@ -205,6 +205,24 @@ const UserCreate = ({ user, users }: UserIndexProps) => {
       sortingFn: "alphanumeric",
       filterFn: "includesString",
     }),
+    columnHelper.accessor(
+      (row) => {
+        switch (row.role) {
+          case "USER":
+            return "Usuário";
+          case "ADMIN":
+            return "Administrador";
+          case "SUPERADMIN":
+            return "Super Administrador";
+        }
+      },
+      {
+        header: "Nível",
+        cell: (info) => info.getValue(),
+        sortingFn: "alphanumeric",
+        filterFn: "includesString",
+      }
+    ),
     columnHelper.accessor("email", {
       header: "Email",
       cell: (info) => info.getValue(),
@@ -283,7 +301,8 @@ export const getServerSideProps: GetServerSideProps<UserIndexProps> = async (
       },
     });
     if (authUser.role === "USER") {
-      const queryParams = "?notificationMessage=Usu%C3%A1rio%20n%C3%A3o%20tem%20permiss%C3%A3o&notificationType=error"
+      const queryParams =
+        "?notificationMessage=Usu%C3%A1rio%20n%C3%A3o%20tem%20permiss%C3%A3o&notificationType=error";
 
       return {
         redirect: {
