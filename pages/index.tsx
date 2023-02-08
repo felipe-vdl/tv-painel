@@ -1,66 +1,57 @@
+import { useState, useEffect } from "react";
 import { GetServerSideProps } from "next";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]";
-import { prisma } from "../db";
-import Head from "next/head";
+import { prisma } from "@/db";
+import { io, Socket } from "socket.io-client";
+let socket: Socket;
 
-interface IndexProps {
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
+const VideoPage = ({ filename }: { filename: string }) => {
+  const [current, setCurrent] = useState(filename);
+
+  const socketInitializer = async () => {
+    await fetch("/api/video/socket");
+    socket = io();
+
+    socket.on("connect", () => {
+      console.log("Connected");
+    });
+
+    socket.on("new-video", (filename: string) => {
+      console.log("NEW VIDEO", filename);
+      setCurrent(filename);
+    });
   };
-}
 
-const IndexPage = ({ user }: IndexProps) => {
+  useEffect(() => {
+    socketInitializer();
+  }, []);
+
+  useEffect(() => {
+    const vidPlayer = document.querySelector("video") as HTMLVideoElement;
+    vidPlayer.load();
+    vidPlayer.play();
+  }, [current]);
+
   return (
-    <>
-      <Head>
-        <title>Dashboard</title>
-      </Head>
-      <div className="m-auto">
-        <h1 className="text-3xl font-medium">
-          Olá, {user.name.split(" ")[0]}.
-        </h1>
-      </div>
-    </>
+    <div className="h-screen w-full overflow-hidden">
+      <video autoPlay muted loop className="cover h-full w-full object-cover">
+        <source src={`/videos/${current}`} />
+      </video>
+    </div>
   );
 };
 
-export const getServerSideProps: GetServerSideProps<IndexProps> = async (
-  context
-) => {
-  const session = await getServerSession(context.req, context.res, authOptions);
+export const getServerSideProps: GetServerSideProps<{
+  filename: string;
+}> = async (context) => {
+  const videos = await prisma.video.findMany();
+  const video = videos[0];
 
-  if (!session) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/login",
-      },
-      props: {},
-    };
-  } else {
-    const authUser = await prisma.user.findFirst({
-      where: {
-        id: +session.user.id,
-      },
-    });
-
-    return {
-      props: {
-        user: {
-          id: authUser.id,
-          name: authUser.name,
-          email: authUser.email,
-          role: authUser.role,
-          is_enabled: authUser.is_enabled,
-        },
-      },
-    };
-  }
+  return {
+    props: {
+      filename: video.filename,
+    },
+  };
 };
 
-IndexPage.layout = "dashboard";
-export default IndexPage;
+VideoPage.layout = "none";
+export default VideoPage;

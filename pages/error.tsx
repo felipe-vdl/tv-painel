@@ -9,7 +9,7 @@ export const getServerSideProps = (context) => {
     return {
       redirect: {
         permanent: false,
-        destination: "/",
+        destination: "/painel",
       },
       props: {},
     };

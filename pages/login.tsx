@@ -39,7 +39,7 @@ const LoginPage = () => {
       });
 
       if (!res.error) {
-        Router.push("/");
+        Router.push("/painel");
         setIsLoading(false);
       } else {
         setNotification({ message: res.error, type: "error" });
@@ -130,7 +130,7 @@ export const getServerSideProps = async (context) => {
     return {
       redirect: {
         permanent: false,
-        destination: "/",
+        destination: "/painel",
       },
       props: {},
     };

@@ -28,8 +28,8 @@ enum Role {
   SUPERADMIN
 }
 
-model Dado {
+model Video {
   id        Int @id @default(autoincrement())
-  nome      String @db.VarChar(50)
-  @@map("dados")
+  filename      String @db.VarChar(50)
+  @@map("videos")
 }

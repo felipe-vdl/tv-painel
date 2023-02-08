@@ -15,6 +15,14 @@ const main = async () => {
       updated_at: null
     }
   });
+
+  const newVideo = await prisma.video.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      filename: "none",
+    }
+  });
 }
 
 main()

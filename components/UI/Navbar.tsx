@@ -17,7 +17,7 @@ export default function Navbar() {
       className={`z-10 bg-dourado px-6 text-2xl font-bold text-white shadow shadow-black/30`}
     >
       <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between">
-        <Link href="/">
+        <Link href="/painel">
           <Image
             src={navbarLogo}
             height={70}
