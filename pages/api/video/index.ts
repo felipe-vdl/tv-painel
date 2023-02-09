@@ -62,6 +62,11 @@ export default async function handler(
       },
     });
 
+    const videos = await fs.readdir(path.join(process.cwd() + "/public/videos"));
+    videos.filter(video => video !== updateVideo.filename).forEach(async video => {
+      await fs.unlink(path.join(process.cwd() + "/public/videos/", video));
+    });
+    
     res?.socket?.server?.io?.emit("new-video", updateVideo.filename);
 
     return res.status(200).json({ message: "Vídeo atualizado com sucesso!" });

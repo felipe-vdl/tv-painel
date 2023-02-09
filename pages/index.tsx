@@ -1,29 +1,28 @@
 import { useState, useEffect } from "react";
 import { GetServerSideProps } from "next";
 import { prisma } from "@/db";
-import { io, Socket } from "socket.io-client";
-let socket: Socket;
+import useSocket from "@/hooks/useSocket";
 
 const VideoPage = ({ filename }: { filename: string }) => {
   const [current, setCurrent] = useState(filename);
 
-  const socketInitializer = async () => {
-    await fetch("/api/video/socket");
-    socket = io();
-
-    socket.on("connect", () => {
-      console.log("Connected");
-    });
-
-    socket.on("new-video", (filename: string) => {
-      console.log("NEW VIDEO", filename);
-      setCurrent(filename);
-    });
-  };
-
+  const socket = useSocket("/api/socket");
   useEffect(() => {
-    socketInitializer();
-  }, []);
+    if (socket) {
+      socket.on("connect", () => {
+        console.log("Connected");
+      });
+
+      socket.on('new-video', (filename: string) => {
+        setCurrent(filename);
+      });
+
+      return () => {
+        socket.off("connect");
+        socket.off("new-message");
+      };
+    }
+  }, [socket]);
 
   useEffect(() => {
     const vidPlayer = document.querySelector("video") as HTMLVideoElement;
