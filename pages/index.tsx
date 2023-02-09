@@ -33,7 +33,7 @@ const VideoPage = ({ filename }: { filename: string }) => {
   return (
     <div className="h-screen w-full overflow-hidden">
       <video autoPlay muted loop className="cover h-full w-full object-cover">
-        <source src={`/videos/${current}`} />
+        <source src={`/api/getvideo/${current}`} />
       </video>
     </div>
   );
