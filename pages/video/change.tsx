@@ -2,6 +2,7 @@ import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]";
+import axios from "axios";
 
 import { AppNotification } from "@/types/interfaces";
 import React, { useState } from "react";
@@ -14,6 +15,7 @@ const UserCreate = () => {
   );
 
   const [file, setFile] = useState<File | null>(null);
+  const [progress, setProgress] = useState<number>(0);
 
   const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -23,18 +25,22 @@ const UserCreate = () => {
         setIsLoading(true);
         const formData = new FormData();
         formData.append("video", file, file.name);
-        const response = await fetch("/api/video", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message);
-        }
-
-        const data = await response.json();
+        
+        const response = await axios.post("/api/video", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (event) => {
+            let percentage: number = Math.round(
+              (event.loaded * 100) / event.total
+            );
+            setProgress(percentage);
+          }
+        })
+        
+        const data = response.data
         setNotification({ type: "success", message: data.message });
+        setProgress(0);
         setFile(null);
         setIsLoading(false);
       } else {
@@ -119,6 +125,9 @@ const UserCreate = () => {
               </p>
             </label>
           </div>
+          { progress > 0 && 
+            <div className="text-center text-light-50 dark:text-dark-50">Carregando... {progress}%</div>
+          }
           <button
             disabled={isLoading}
             className="rounded-[10px] bg-roxo p-1 text-xl font-light hover:bg-indigo-700 disabled:bg-indigo-400"
