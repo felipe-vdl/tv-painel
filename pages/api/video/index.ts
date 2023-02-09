@@ -14,10 +14,12 @@ export const config = {
 
 const readFile = (req: NextApiRequest, saveLocally: boolean) => {
   const options: {
+    maxFileSize?: number,
     uploadDir?: string;
     filename?: (name: any, ext: any, path: any, form: any) => string;
   } = {};
   if (saveLocally) {
+    options.maxFileSize = 2000 * 1024 * 1024;
     options.uploadDir = path.join(process.cwd(), "/public/videos");
     options.filename = (name, ext, path, form) => {
       return `${Date.now().toString()}_${Math.floor(Math.random() * 10001)}_${
